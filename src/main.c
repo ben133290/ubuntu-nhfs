@@ -21,30 +21,61 @@ void print_usage_and_exit(void) {
     exit(1);
 }
 
-void handle_tag_command(int argc, char *argv[]) {
+int handle_add_tag_command(int argc, char *argv[]) {
+    char *filename = argv[1];
+    char *tag = argv[2];
 
-    if (argc != 4) {
-        printf("Usage: tfs tag add [file] [tag]\n");
-        return;
-    }
-
-    char *filename = argv[2];
-    char *tag = argv[3];
-
-    // Open the tags file for appending or create it if it doesn't exist
-    FILE *tags_file = fopen(TAGS_FILE, "a");
+    // Open the tags file for reading and writing
+    FILE *tags_file = fopen(TAGS_FILE, "r+");
     if (tags_file == NULL) {
         printf("Error: could not open tags file\n");
-        return;
+        return -1;
     }
 
-    // Write the tag and filename to the tags file
-    fprintf(tags_file, "%s %s\n", tag, filename);
+    // Search for the tag in the tags file
+    char line[1024];
+    int tag_found = 0;
+    while (fgets(line, 1024, tags_file)) {
+        char *line_tag = strtok(line, " ");
+        if (strcmp(line_tag, tag) == 0) {
+            // Tag found, append filename to the line and write back to file
+            tag_found = 1;
+            printf("Info: Tag already exists\n");
+            // TODO: add file name to the end of the current line in the file
+            fseek(tags_file, -1, SEEK_CUR);
+            fprintf(tags_file, " %s\n", filename);
+            break;
+        }
+    }
+
+    // If the tag doesn't exist in the tags file, write a new line to the end of the file
+    if (!tag_found) {
+        fseek(tags_file, 0, SEEK_END);
+        fprintf(tags_file, "%s %s\n", tag, filename);
+    }
 
     // Close the tags file
     fclose(tags_file);
 
-    printf("Tag added successfully\n");
+    return 0;
+}
+
+void handle_tag_command(int argc, char *argv[]) {
+
+    if (argc != 4) {
+        printf("Usage: nhfs tag add [file] [tag]\n");
+        return;
+    }
+
+    char *command_option = argv[1];
+
+    if (strcmp(command_option, "add") == 0) {
+        if (handle_add_tag_command(argc - 1, &argv[1]) == -1) {
+            printf("Error: could not add tag\n");
+        } else {
+            printf("Tag added successfully\n");
+        }
+    }
 }
 
 void handle_search_command(int argc, char *argv[]) {
@@ -52,7 +83,21 @@ void handle_search_command(int argc, char *argv[]) {
 }
 
 void handle_list_command(void) {
-    // TODO: handle search command
+
+
+
+    FILE *tags_file = fopen(TAGS_FILE, "r");
+    if (tags_file == NULL) {
+        printf("Error: could not open tags file\n");
+        return;
+    }
+
+    char line[1024];
+    while (fgets(line, sizeof(line), tags_file)) {
+        printf("%s", line);
+    }
+
+    fclose(tags_file);
 }
 
 void handle_clear_command(void) {

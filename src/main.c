@@ -14,6 +14,7 @@ void print_usage_and_exit(void) {
     printf("  tag    Add or remove tags from files\n");
     printf("  search Search for files by tag\n");
     printf("  list   List all tags\n");
+    printf("  clear  Clear the tag file, deleting all tags\n");
     printf("\n");
     printf("Options:\n");
     printf("  -h, --help       Display this help message\n");
@@ -41,9 +42,26 @@ int handle_add_tag_command(int argc, char *argv[]) {
             // Tag found, append filename to the line and write back to file
             tag_found = 1;
             printf("Info: Tag already exists\n");
+
             // TODO: add file name to the end of the current line in the file
+            // Move to character right before the new line character on that line
             fseek(tags_file, -1, SEEK_CUR);
-            fprintf(tags_file, " %s\n", filename);
+            long insert_position = ftell(tags_file);
+
+            // Create buffer to store text to be moved and move cursor back
+            char *buffer;
+            fseek(tags_file, 0, SEEK_END);
+            long end_position = ftell(tags_file);
+            fseek(tags_file, insert_position, SEEK_SET);
+            long num_bytes = end_position - insert_position;
+            buffer = (char *)calloc(num_bytes, sizeof(char));
+
+            // Read rest of file into buffer
+            fread(buffer, sizeof(char), num_bytes, tags_file);
+            fseek(tags_file, insert_position, SEEK_SET);
+
+            fprintf(tags_file, " %s%s", filename, buffer);
+            printf("Debug: File cursor postition %ld\n", ftell(tags_file));
             break;
         }
     }

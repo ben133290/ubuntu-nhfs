@@ -6,10 +6,16 @@ nhfs()
     if $1 == ''
     then
     	./tfs
-    elif $1 == ''
+    elif $2 == ''
     then
 	./tfs $1
-    else
+	elif $3 == ''
+	then
 	./tfs $1 $2
+	elif $4 == ''
+    	then
+    	./tfs $1 $2 $3
+    else
+	./tfs $1 $2 $3 $4
     fi
 }

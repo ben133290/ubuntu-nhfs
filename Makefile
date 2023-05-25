@@ -5,7 +5,7 @@ SRCDIR = src
 OBJDIR = obj
 BINDIR = bin
 
-TARGET = $(BINDIR)/tfs
+TARGET = $(BINDIR)/nhfs
 
 SRCS = $(wildcard $(SRCDIR)/*.c)
 OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))

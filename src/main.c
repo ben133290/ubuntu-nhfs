@@ -8,7 +8,7 @@
 //#include "tag.h"
 
 void print_usage_and_exit(void) {
-    printf("Usage: tfs <command> [options]\n");
+    printf("Usage: nhfs <command> [options]\n");
     printf("\n");
     printf("Commands:\n");
     printf("  tag    Add or remove tags from files\n");
@@ -20,6 +20,15 @@ void print_usage_and_exit(void) {
     printf("  -h, --help       Display this help message\n");
     printf("\n");
     exit(1);
+}
+
+void print_tag_usage(void) {
+    printf("Usage: nhfs tag [operation]\n");
+    printf("\n");
+    printf("Operations:\n");
+    printf("  add    Add tags to files\n");
+    printf("  remove Remove tags from files\n");
+    printf("\n");
 }
 
 int handle_add_tag_command(int argc, char *argv[]) {
@@ -78,11 +87,19 @@ int handle_add_tag_command(int argc, char *argv[]) {
     return 0;
 }
 
-void handle_tag_command(int argc, char *argv[]) {
+int handle_remove_tag_command(int argc, char *argv[]) {
 
-    if (argc != 4) {
-        printf("Usage: nhfs tag add [file] [tag]\n");
-        return;
+    //TODO: implment remove tag
+    printf("Not yet implemented\n");
+    return -1;
+}
+
+int handle_tag_command(int argc, char *argv[]) {
+
+    // handle incorrect usage
+    if (argc <= 1 || argc > 4) {
+        print_tag_usage();
+        return 0;
     }
 
     char *command_option = argv[1];
@@ -90,14 +107,28 @@ void handle_tag_command(int argc, char *argv[]) {
     if (strcmp(command_option, "add") == 0) {
         if (handle_add_tag_command(argc - 1, &argv[1]) == -1) {
             printf("Error: could not add tag\n");
+            return -1;
+            
         } else {
             printf("Tag added successfully\n");
+            return 0;
+        }
+    }
+
+    if (strcmp(command_option, "remove") == 0) {
+        if (handle_remove_tag_command(argc - 1, &argv[1]) == -1) {
+            printf("Error: could not remove tag\n");
+            return -1;
+        } else {
+            printf("Tag added successfully\n");
+            return 0;
         }
     }
 }
 
 void handle_search_command(int argc, char *argv[]) {
     // TODO: handle search command
+    printf("Not yet implemented\n");
 }
 
 void handle_list_command(void) {

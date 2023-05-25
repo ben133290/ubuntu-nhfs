@@ -1,2 +1,2 @@
-important test.txt test2.txt test2.txt test3.txt
-amazing test2.txt
+great test.txt
+bad test.txt test2.txt

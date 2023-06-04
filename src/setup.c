@@ -6,7 +6,7 @@
 
 FILE *fptr;
 
-int main()
+int add_bash_function()
 {
     int status1 = system("chmod u+x bash_function.sh");
     int status2 = system("./bash_function.sh");

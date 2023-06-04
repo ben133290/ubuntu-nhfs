@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include "setup.h"
+#include "../include/setup.h"
 
 #define TAGS_FILE "data/tags.txt"
 //#include "file.h"

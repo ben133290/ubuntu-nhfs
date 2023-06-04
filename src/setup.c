@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdlib.h>
+#include "../include/setup.h"
 
 // TODO: when filesystem is set up, should alter ~/.bashrc and add path of tfs
 

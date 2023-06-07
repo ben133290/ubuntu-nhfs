@@ -1,3 +1,7 @@
+/*
+How to use this:
+There is an example main function at the bottom of this implementation.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,6 +46,7 @@ void addEdge(Graph* graph, int id1, int id2) {
     Node* node1 = NULL;
     Node* node2 = NULL;
 
+    // Check if both nodes exist (are in the graph)
     for (int i = 0; i < graph->nodeCount; i++) {
         if (graph->nodes[i]->id == id1) {
             node1 = graph->nodes[i];
@@ -59,6 +64,7 @@ void addEdge(Graph* graph, int id1, int id2) {
         return;
     }
 
+    // Add edge between nodes
     Node* edge1 = createNode(id2, node2->type);
     Node* edge2 = createNode(id1, node1->type);
 
@@ -191,6 +197,114 @@ void printGraph(Graph* graph) {
     }
 }
 
+void saveGraph(Graph* graph, const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        printf("Unable to open the file for saving.\n");
+        return;
+    }
+
+    // first line is the number of nodes
+    fprintf(file, "%d\n", graph->nodeCount);
+
+    for (int i = 0; i < graph->nodeCount; i++) {
+        Node* node = graph->nodes[i];
+        fprintf(file, "%d %s ", node->id, node->type);
+
+        Node* current = node->next;
+        while (current != NULL) {
+            fprintf(file, "%d ", current->id);
+            current = current->next;
+        }
+
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+}
+
+Graph* loadGraph(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Unable to open the file for loading.\n");
+        return NULL;
+    }
+
+    Graph* graph = createGraph();
+    int nodeCount;
+    char buffer[256]; // Used for skipping parts of the file with fgets
+    fscanf(file, "%d", &nodeCount);
+    printf("Nodecount read from file: %d\n", nodeCount);
+
+    // Read and add nodes
+    for (int i = 0; i < nodeCount; i++) {
+        int id;
+        char type[50];
+
+        fscanf(file, "%d %s", &id, type);
+        addNode(graph, id, type);
+        fgets(buffer, sizeof(buffer), file);
+    }
+
+    // Read and add edges
+    fseek(file, 0, SEEK_SET);  // Reset file pointer to the beginning
+
+    fgets(buffer, sizeof(buffer), file);  // Skip the first line
+
+    memset(buffer, '\0', sizeof(buffer));
+    int id;
+    while (fgets(buffer, sizeof(buffer), file)) {
+        // Skip type
+        char type[50];
+        sscanf(buffer, "%d %s", &id, type);
+
+        printf("Buffer: %s", buffer);
+        // Read edges
+        char* token = strtok(buffer, " ");  // Skip the ID and type
+        token = strtok(NULL, " ");  // Start with the first edge ID
+        token = strtok(NULL, " "); // Get first token (edge ID)
+
+        while (token != NULL) {
+            int edgeId;
+            if (sscanf(token, "%d", &edgeId) == 1) {
+                printf("Adding edge from %d to %d\n", id, edgeId);
+                if (hasEdge(graph, id, edgeId) == 0) {
+                    addEdge(graph, id, edgeId);
+                }
+            }
+            token = strtok(NULL, " ");  // Get the next token (edge ID)
+        }
+        memset(buffer, '\0', sizeof(buffer));
+    }
+
+    fclose(file);
+    return graph;
+}
+
+int hasEdge(Graph* graph, int id1, int id2) {
+    // Find the node with id
+    Node* node = NULL;
+    for (int i = 0; i < graph->nodeCount; i++) {
+        if (graph->nodes[i]->id == id1) {
+            node = graph->nodes[i];
+            break;
+        }
+    }
+
+    // Traverse the edges of the node to check if id2 exists
+    if (node != NULL) {
+        Node* current = node->next;
+        while (current != NULL) {
+            if (current->id == id2) {
+                return 1;  // Edge found
+            }
+            current = current->next;
+        }
+    }
+
+    return 0;  // Edge not found
+}
+
 // Use this to free the graph after use
 void freeGraph(Graph* graph) {
     for (int i = 0; i < graph->nodeCount; i++) {
@@ -208,7 +322,9 @@ void freeGraph(Graph* graph) {
 }
 
 // Example main method for testing (comment out to avoid duplicate main)
+/*
 int main() {
+
     Graph* graph = createGraph();
 
     addNode(graph, 1, "tag");
@@ -222,11 +338,15 @@ int main() {
 
     printGraph(graph);
 
-    removeEdge(graph, 1, 3);
-    removeNode(graph, 4);
-
-    printGraph(graph);
+    saveGraph(graph, "../data/graph.txt");
 
     freeGraph(graph);
+
+    Graph* loadedGraph = loadGraph("../data/graph.txt");
+    if (loadedGraph != NULL) {
+        printGraph(loadedGraph);
+        freeGraph(loadedGraph);
+    }
     return 0;
 }
+*/

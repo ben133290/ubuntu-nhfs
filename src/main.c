@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "../include/setup.h"
+#include "../include/graph.h"
 
 #define TAGS_FILE "data/tags.txt"
 //#include "file.h"

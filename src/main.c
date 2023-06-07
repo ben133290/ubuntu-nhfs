@@ -4,16 +4,19 @@
 #include <sys/stat.h>
 #include "../include/setup.h"
 #include "../include/graph.h"
+#include "../include/util.h"
 
 #define TAGS_FILE "data/tags.txt"
 //#include "file.h"
 //#include "tag.h"
 
+Graph* graph;
+
 void print_usage_and_exit(void) {
     printf("Usage: nhfs <command> [options]\n");
     printf("\n");
     printf("Commands:\n");
-    printf("  tag    Add or remove tags from files\n");
+    printf("  add    Add tag or file\n");
     printf("  search Search for files by tag\n");
     printf("  list   List all tags\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
@@ -24,108 +27,59 @@ void print_usage_and_exit(void) {
     exit(1);
 }
 
-void print_tag_usage(void) {
-    printf("Usage: nhfs tag [operation]\n");
-    printf("\n");
-    printf("Operations:\n");
-    printf("  add    Add tags to files\n");
-    printf("  remove Remove tags from files\n");
-    printf("\n");
-}
+int add(int argc, char *argv[]) {
+    char *name = argv[1];
+    char *type = argv[2];
+    char header_path[256];  // Allocate memory for header_path
+    char file_create_path[256];  // Allocate memory for file_create_path
 
-int handle_add_tag_command(int argc, char *argv[]) {
-    char *filename = argv[1];
-    char *tag = argv[2];
+    printf("Checking if file exists\n");
+    // check if file already exists
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        // Open corr. header file and read name
+        // return 1 if exists ie == name
+        printf("Checking node: %d\n", i);
+        if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
+            printf("Error: couldn't create header path\n");
+            return -1;  // Return an error code
+        }
 
-    // Open the tags file for reading and writing
-    FILE *tags_file = fopen(TAGS_FILE, "r+");
-    if (tags_file == NULL) {
-        printf("Error: could not open tags file\n");
-        return -1;
-    }
+        char *read_name = readNthLine(header_path, 1);
 
-    // Search for the tag in the tags file
-    char line[1024];
-    int tag_found = 0;
-    while (fgets(line, 1024, tags_file)) {
-        char *line_tag = strtok(line, " ");
-        if (strcmp(line_tag, tag) == 0) {
-            // Tag found, append filename to the line and write back to file
-            tag_found = 1;
-            printf("Info: Tag already exists\n");
-
-            // TODO: add file name to the end of the current line in the file
-            // Move to character right before the new line character on that line
-            fseek(tags_file, -1, SEEK_CUR);
-            long insert_position = ftell(tags_file);
-
-            // Create buffer to store text to be moved and move cursor back
-            char *buffer;
-            fseek(tags_file, 0, SEEK_END);
-            long end_position = ftell(tags_file);
-            fseek(tags_file, insert_position, SEEK_SET);
-            long num_bytes = end_position - insert_position;
-            buffer = (char *)calloc(num_bytes, sizeof(char));
-
-            // Read rest of file into buffer
-            fread(buffer, sizeof(char), num_bytes, tags_file);
-            fseek(tags_file, insert_position, SEEK_SET);
-
-            fprintf(tags_file, " %s%s", filename, buffer);
-            printf("Debug: File cursor postition %ld\n", ftell(tags_file));
-            break;
+        if (read_name != NULL && strcmp(read_name, name) == 0) {
+            printf("Name already used!\n");
+            return -1;
         }
     }
 
-    // If the tag doesn't exist in the tags file, write a new line to the end of the file
-    if (!tag_found) {
-        fseek(tags_file, 0, SEEK_END);
-        fprintf(tags_file, "%s %s\n", tag, filename);
+    // Create header file
+    if (sprintf(file_create_path, "data/%d.txt", graph->nodeCount + 1) < 0) {
+        printf("Error: Couldn't create header file\n");
+        return -1;
     }
 
-    // Close the tags file
-    fclose(tags_file);
+    // add Node to graph
+    addNode(graph, graph->nodeCount+1, type);
+
+    FILE *head_file = fopen(file_create_path, "w");
+    if (head_file == NULL) {
+        printf("Error: could not create header at %s\n", file_create_path);
+        return -1;
+    }
+    fprintf(head_file, "%s\n", name);
+    fclose(head_file);
+
+    saveGraph(graph, "data/graph.txt");
 
     return 0;
 }
+
 
 int handle_remove_tag_command(int argc, char *argv[]) {
 
     //TODO: implment remove tag
     printf("Not yet implemented\n");
     return -1;
-}
-
-int handle_tag_command(int argc, char *argv[]) {
-
-    // handle incorrect usage
-    if (argc <= 1 || argc > 4) {
-        print_tag_usage();
-        return 0;
-    }
-
-    char *command_option = argv[1];
-
-    if (strcmp(command_option, "add") == 0) {
-        if (handle_add_tag_command(argc - 1, &argv[1]) == -1) {
-            printf("Error: could not add tag\n");
-            return -1;
-            
-        } else {
-            printf("Tag added successfully\n");
-            return 0;
-        }
-    }
-
-    if (strcmp(command_option, "remove") == 0) {
-        if (handle_remove_tag_command(argc - 1, &argv[1]) == -1) {
-            printf("Error: could not remove tag\n");
-            return -1;
-        } else {
-            printf("Tag added successfully\n");
-            return 0;
-        }
-    }
 }
 
 void handle_search_command(int argc, char *argv[]) {
@@ -173,6 +127,12 @@ int main(int argc, char *argv[]) {
         mkdir("data", 0777);
     }
 
+    graph = loadGraph("data/graph.txt");
+    if (graph == NULL) {
+        graph = createGraph();
+    }
+    printGraph(graph);
+
     // Create the tags file if it doesn't exist
     FILE *tags_file = fopen(TAGS_FILE, "a");
     if (tags_file == NULL) {
@@ -188,8 +148,8 @@ int main(int argc, char *argv[]) {
 
     char *command = argv[1];
 
-    if (strcmp(command, "tag") == 0) {
-        handle_tag_command(argc - 1, &argv[1]);
+    if (strcmp(command, "add") == 0) {
+        add(argc - 1, &argv[1]);
     } else if (strcmp(command, "search") == 0) {
         handle_search_command(argc - 1, &argv[1]);
     } else if (strcmp(command, "clear") == 0) {

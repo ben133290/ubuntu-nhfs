@@ -226,7 +226,7 @@ void saveGraph(Graph* graph, const char* filename) {
 Graph* loadGraph(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Unable to open the file for loading.\n");
+        printf("Unable to open the file for loading from %s.\n", filename);
         return NULL;
     }
 

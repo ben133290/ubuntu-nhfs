@@ -18,7 +18,6 @@ void print_usage_and_exit(void) {
     printf("Commands:\n");
     printf("  add    Add tag or file\n");
     printf("  remove Remove a tag or file\n");
-    printf("  search Search for files by tag\n");
     printf("  list   List all tags\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
     printf("\n");
@@ -67,7 +66,7 @@ int add(int argc, char *argv[]) {
         printf("Error: could not create header at %s\n", file_create_path);
         return -1;
     }
-    fprintf(head_file, "%s\n", name);
+    fprintf(head_file, "%s\n%s\n", name, type);
     fclose(head_file);
 
     saveGraph(graph, "data/graph.txt");
@@ -130,18 +129,9 @@ void list(void) {
     return;
 }
 
-void handle_clear_command(void) {
-    // Open the tags file for writing or create it if it doesn't exist
-    FILE *tags_file = fopen(TAGS_FILE, "w");
-    if (tags_file == NULL) {
-        printf("Error: could not open tags file\n");
-        return;
-    }
-
-    // Close the tags file
-    fclose(tags_file);
-
-    printf("Tags cleared successfully\n");
+void clear(void) {
+    removeDirectory("data");
+    return;
 }
 
 int main(int argc, char *argv[]) {
@@ -155,16 +145,9 @@ int main(int argc, char *argv[]) {
     graph = loadGraph("data/graph.txt");
     if (graph == NULL) {
         graph = createGraph();
+        saveGraph(graph, "data/graph.txt");
     }
     printGraph(graph);
-
-    // Create the tags file if it doesn't exist
-    FILE *tags_file = fopen(TAGS_FILE, "a");
-    if (tags_file == NULL) {
-        printf("Error: could not create tags file\n");
-        return 1;
-    }
-    fclose(tags_file);
 
     // Parse command-line arguments
     if (argc < 2) {
@@ -178,7 +161,7 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(command, "remove") == 0) {
         rmv(argc - 1, &argv[1]);
     } else if (strcmp(command, "clear") == 0) {
-        handle_clear_command();
+        clear();
     } else if (strcmp(command, "list") == 0) {
         list();
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {

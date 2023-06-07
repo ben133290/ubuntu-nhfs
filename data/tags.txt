@@ -1,2 +1,0 @@
-great test.txt
-bad test.txt test2.txt

@@ -108,22 +108,26 @@ void handle_search_command(int argc, char *argv[]) {
     printf("Not yet implemented\n");
 }
 
-void handle_list_command(void) {
+void list(void) {
+    char header_path[256];
 
+    printf("Tags:\n");
 
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
+            printf("Error: couldn't create header path\n");
+            return;  // Return an error code
+        }
 
-    FILE *tags_file = fopen(TAGS_FILE, "r");
-    if (tags_file == NULL) {
-        printf("Error: could not open tags file\n");
-        return;
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_type != NULL && strcmp(read_type, "tag") == 0) {
+            printf("   %s\n", read_name);
+        }
     }
 
-    char line[1024];
-    while (fgets(line, sizeof(line), tags_file)) {
-        printf("%s", line);
-    }
-
-    fclose(tags_file);
+    return;
 }
 
 void handle_clear_command(void) {
@@ -176,7 +180,7 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(command, "clear") == 0) {
         handle_clear_command();
     } else if (strcmp(command, "list") == 0) {
-        handle_list_command();
+        list();
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
         print_usage_and_exit();
     } else {

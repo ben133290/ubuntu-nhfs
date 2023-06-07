@@ -6,33 +6,35 @@
 char* readNthLine(const char* filename, int n) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Unable to open the file.\n");
+        printf("Failed to open the file.\n");
         return NULL;
     }
 
-    // Move the file pointer to the desired line
-    int lineCount = 1;
-    char buffer[256];
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
-        if (lineCount == n) {
-            // Allocate memory to store the line
-            char* line = (char*)malloc((strlen(buffer) + 1) * sizeof(char));
-            if (line == NULL) {
-                printf("Memory allocation failed.\n");
-                fclose(file);
-                return NULL;
+    char* line = NULL;
+    size_t bufferSize = 0;
+    size_t bytesRead;
+    int currentLine = 1;
+
+    while ((bytesRead = getline(&line, &bufferSize, file)) != -1) {
+        if (currentLine == n) {
+            // Remove newline character from the end of the line, if present
+            while (bytesRead > 0 && (line[bytesRead - 1] == '\n' || line[bytesRead - 1] == '\r')) {
+                line[bytesRead - 1] = '\0';
+                bytesRead--;
             }
 
-            // Copy the line into the allocated memory
-            strcpy(line, buffer);
-
-            fclose(file);
-            return line;
+            break;
         }
-        lineCount++;
+        currentLine++;
     }
 
-    printf("Specified line does not exist.\n");
     fclose(file);
-    return NULL;
+
+    if (currentLine < n) {
+        printf("Requested line does not exist in the file.\n");
+        free(line);
+        return NULL;
+    }
+
+    return line;
 }

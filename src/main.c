@@ -17,6 +17,7 @@ void print_usage_and_exit(void) {
     printf("\n");
     printf("Commands:\n");
     printf("  add    Add tag or file\n");
+    printf("  remove Remove a tag or file\n");
     printf("  search Search for files by tag\n");
     printf("  list   List all tags\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
@@ -74,12 +75,32 @@ int add(int argc, char *argv[]) {
     return 0;
 }
 
+int rmv(int argc, char *argv[]) {
+    char * name = argv[1];
+    char header_path[256];
+    
+    printf("Searching for node with name %s\n", name);
+    // Check if file with name exists
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
+            printf("Error: couldn't create header path\n");
+            return -1;  // Return an error code
+        }
 
-int handle_remove_tag_command(int argc, char *argv[]) {
+        char *read_name = readNthLine(header_path, 1);
 
-    //TODO: implment remove tag
-    printf("Not yet implemented\n");
-    return -1;
+        if (read_name != NULL && strcmp(read_name, name) == 0) {
+            // Delete the file
+            remove(header_path);
+            removeNode(graph, i);
+            saveGraph(graph, "data/graph.txt");
+            printf("Removed header file at %s\n", header_path);
+        }
+    }
+
+    // Update graph
+
+    return 0;
 }
 
 void handle_search_command(int argc, char *argv[]) {
@@ -150,8 +171,8 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(command, "add") == 0) {
         add(argc - 1, &argv[1]);
-    } else if (strcmp(command, "search") == 0) {
-        handle_search_command(argc - 1, &argv[1]);
+    } else if (strcmp(command, "remove") == 0) {
+        rmv(argc - 1, &argv[1]);
     } else if (strcmp(command, "clear") == 0) {
         handle_clear_command();
     } else if (strcmp(command, "list") == 0) {

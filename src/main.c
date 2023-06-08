@@ -21,14 +21,14 @@ void print_usage_and_exit(void) {
     printf("\n");
     printf("Commands:\n");
     printf("  add    Add tag or file\n");
-    printf("  remove Remove a tag or file\n");
+    printf("  remove Remove a tag or file from file system\n");
     printf("  list   List all tags\n");
     printf("  info   Print infomation on tag or file\n");
     printf("  link   Create a link between a file and a tag\n");
     printf("  unlink Remove a link between a file and a tag\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
     printf("  create Create a txt file and add it to the file system\n");
-    printf("  delete Delete a file\n");
+    printf("  delete Delete a file or tag entirely\n");
     printf("\n");
     printf("Options:\n");
     printf("  -h, --help       Display this help message\n");

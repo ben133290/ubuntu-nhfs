@@ -7,7 +7,10 @@
 #include "../include/util.h"
 #include "../include/interactionSys.h"
 
+#ifndef GRAPH_FILE
 #define GRAPH_FILE "data/graph.txt"
+#endif
+#define GRAPH_MAX 1000
 //#include "file.h"
 //#include "tag.h"
 
@@ -25,6 +28,7 @@ void print_usage_and_exit(void) {
     printf("  unlink Remove a link between a file and a tag\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
     printf("  create Create a txt file and add it to the file system\n");
+    printf("  delete Delete a file\n");
     printf("\n");
     printf("Options:\n");
     printf("  -h, --help       Display this help message\n");
@@ -37,14 +41,17 @@ int add(int argc, char *argv[]) {
     char *type = argv[2];
     char header_path[256];  // Allocate memory for header_path
     char file_create_path[256];  // Allocate memory for file_create_path
+    int id = 0;
+    int *nodes = getUsedIDs();
 
     printf("Checking if file exists\n");
     // check if file already exists
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int i = 0; i < graph->nodeCount; i++) {
+        id = nodes[i];
         // Open corr. header file and read name
         // return 1 if exists ie == name
-        printf("Checking node: %d\n", i);
-        if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
+        printf("Checking node: %d\n", id);
+        if (sprintf(header_path, "data/%d.txt", id) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
             return -1;  // Return an error code
         }
@@ -57,14 +64,17 @@ int add(int argc, char *argv[]) {
         }
     }
 
-    // Create header file
-    if (sprintf(file_create_path, "data/%d.txt", graph->nodeCount + 1) < 0) {
+    // Find unused id
+    int newId = getUnusedID();
+
+    // Create header file path
+    if (sprintf(file_create_path, "data/%d.txt", newId) < 0) {
         printf("Error: Couldn't create header file\n");
         return -1;
     }
 
-    // add Node to graph
-    addNode(graph, graph->nodeCount+1, type);
+    // Add Node to graph
+    addNode(graph, newId, type);
 
     if (strcmp(type, "file") == 0) {
         if (argv[3] == NULL) {
@@ -73,6 +83,7 @@ int add(int argc, char *argv[]) {
         }
     }
 
+    // Create new head file 
     FILE *head_file = fopen(file_create_path, "w");
     if (head_file == NULL) {
         printf("Error: could not create header at %s\n", file_create_path);
@@ -91,13 +102,17 @@ int add(int argc, char *argv[]) {
     return 0;
 }
 
+// Remove header file and node from graph
 int rmv(int argc, char *argv[]) {
     char * name = argv[1];
     char header_path[256];
+    int *nodes = getUsedIDs();
+    int i;
     
     printf("Searching for node with name %s\n", name);
     // Check if file with name exists
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
             return -1;  // Return an error code
@@ -118,17 +133,16 @@ int rmv(int argc, char *argv[]) {
     return 0;
 }
 
-void handle_search_command(int argc, char *argv[]) {
-    // TODO: handle search command
-    printf("Not yet implemented\n");
-}
-
 void list(void) {
     char header_path[256];
+    int *nodes = getUsedIDs();
+    int i;
+    
 
     printf("Tags:\n");
 
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 1; j < graph->nodeCount; j++) {
+        i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
             return;  // Return an error code
@@ -163,9 +177,13 @@ int link(int argc, char *argv[]) {
     int file2_exists = 0;
     int id1 = 0;
     int id2 = 0;
+    int *nodes = getUsedIDs();
+    int i;
+    
 
     // Check for file 1
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
@@ -182,7 +200,8 @@ int link(int argc, char *argv[]) {
     }
 
     // Check for file 2
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
@@ -222,9 +241,12 @@ int unlink(int argc, char *argv[]) {
     int file2_exists = 0;
     int id1 = 0;
     int id2 = 0;
+    int *nodes = getUsedIDs();
+    int i;
 
     // Check for file 1
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
@@ -241,7 +263,8 @@ int unlink(int argc, char *argv[]) {
     }
 
     // Check for file 2
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
@@ -268,12 +291,33 @@ int unlink(int argc, char *argv[]) {
     return 0;
 }
 
+int print_adj(int nodeId) {
+    char header_path[256];
+    int i;
+    int *nodes = getUsedIDs();
+
+    printf("  Files:\n");
+    
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
+        if (hasEdge(graph, nodeId, i)) {
+            sprintf(header_path, "data/%d.txt", i);
+            char *read_name = readNthLine(header_path, 1);
+            printf("    %s\n", read_name);
+        }
+    }
+    return 0;
+}
+
 int fileinfo(int argc, char *argv[]) {
     char *name1 = argv[1];
     char header_path[256];
+    int i;
+    int *nodes = getUsedIDs();
 
     // Check for file 2
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
@@ -283,6 +327,7 @@ int fileinfo(int argc, char *argv[]) {
                 printf("INFO\n");
                 printf("  Id:   %d\n", i);
                 printf("  Name: %s\n", read_name);
+                print_adj(i);
             } else if (strcmp(read_type, "file") == 0) {
                 printf("INFO\n");
                 printf("  Id:   %d\n", i);
@@ -315,10 +360,45 @@ int create(int argc,char *argv[]) {
     return add(4, newargs);
 }
 
+void deletefile(int argc, char *argv[]) {
+    char *name = argv[1];
+    char header_path[256];
+    int i;
+    int *nodes = getUsedIDs();
+
+    // Check for file
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
+        sprintf(header_path, "data/%d.txt", i);
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_name != NULL && strcmp(name, read_name) == 0) {
+            printf("Attempting to delete %d (key %d)\n", i, strcmp(read_type, "file"));
+            if (strcmp(read_type, "file") == 0) {
+                printf("Yes! It's a file!");
+                char *read_path = readNthLine(header_path, 3);
+                printf("Deleting file %s\n", read_path);
+                if (remove(read_path) == 0) {
+                    printf("File deleted successfully.\n");
+                } else {
+                    printf("Unable to delete the file.\n");
+                }
+            } 
+            rmv(argc, argv);
+            return;
+        }
+    }
+
+    return;
+}
+
 int renamefile(int argc, char *argv[]) {
     char *oldName = argv[1];
     char *newName = malloc(strlen(argv[2]) + 2);  // Allocate memory for newName
     char header_path[256];
+    int i;
+    int *nodes = getUsedIDs();
 
     if (newName == NULL) {
         printf("Error: Memory allocation failed.\n");
@@ -333,7 +413,8 @@ int renamefile(int argc, char *argv[]) {
     strcat(newName, "\n");
 
     // Check for file
-    for (int i = 1; i <= graph->nodeCount; i++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
         sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
@@ -383,6 +464,8 @@ int main(int argc, char *argv[]) {
         link(argc - 1, &argv[1]);
     } else if (strcmp(command, "create") == 0) {
         create(argc - 1, &argv[1]);
+    } else if (strcmp(command, "delete") == 0) {
+        deletefile(argc - 1, &argv[1]);
     } else if (strcmp(command, "unlink") == 0) {
         unlink(argc - 1, &argv[1]);
     } else if (strcmp(command, "info") == 0) {

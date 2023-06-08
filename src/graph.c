@@ -5,7 +5,12 @@ There is an example main function at the bottom of this implementation.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "../include/graph.h"
+
+#ifndef GRAPH_FILE
+#define GRAPH_FILE "data/graph.txt"
+#endif
 
 // Graph constructor
 Graph* createGraph() {
@@ -316,6 +321,79 @@ void freeGraph(Graph* graph) {
 
     free(graph->nodes);
     free(graph);
+}
+
+int getUnusedID() {
+    char *filename = GRAPH_FILE;
+
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return -1;
+    }
+
+    int lowestMissingNumber = 0;
+    int isFirstLine = 1;
+    char line[256];
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        // Skip the first line
+        if (isFirstLine) {
+            isFirstLine = 0;
+            continue;
+        }
+
+        // Check if the line is non-empty
+        if (line[0] != '\n') {
+            int num = atoi(line);
+
+            // Update the lowest missing number if necessary
+            if (num == lowestMissingNumber) {
+                lowestMissingNumber++;
+            }
+        }
+    }
+
+    fclose(file);
+
+    return lowestMissingNumber;
+}
+
+int* getUsedIDs() {
+    char *filename = GRAPH_FILE;
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return NULL;
+    }
+
+    int* numbers = NULL;
+    int numbersCount = 0;
+    char line[256];
+    int isFirstLine = 1;
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        // Skip the first line
+        if (isFirstLine) {
+            isFirstLine = 0;
+            continue;
+        }
+
+        // Check if the line is non-empty
+        if (line[0] != '\n') {
+            int num = atoi(&line[0]);
+
+            // Resize the numbers array
+            numbersCount++;
+            numbers = (int*)realloc(numbers, numbersCount * sizeof(int));
+
+            // Store the number in the array
+            numbers[numbersCount - 1] = num;
+        }
+    }
+
+    fclose(file);
+    return numbers;
 }
 
 // Example main method for testing (comment out to avoid duplicate main)

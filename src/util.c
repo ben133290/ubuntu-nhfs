@@ -50,40 +50,47 @@ char* readNthLine(const char* filename, int n) {
     return line;
 }
 
-void replaceNthLine(const char* filename, int n, const char* newString) {
-    FILE* file = fopen(filename, "r+");
+void replaceNthLine(const char *filename, int n, const char *newContent) {
+    // Open the input file for reading
+    FILE *file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Error: Failed to open the file.\n");
+        printf("Error: Failed to open file %s\n", filename);
         return;
     }
 
+    // Create a temporary file to store the modified content
+    char tempFilename[256];
+    sprintf(tempFilename, "%s.tmp", filename);
+    FILE *tempFile = fopen(tempFilename, "w");
+    if (tempFile == NULL) {
+        fclose(file);
+        printf("Error: Failed to create temporary file\n");
+        return;
+    }
+
+    // Read lines from the input file and write them to the temporary file
     char buffer[1024];
     int lineCount = 0;
-    int foundLine = 0;
-
-    // Read and write line by line
-    while (fgets(buffer, sizeof(buffer), file)) {
+    while (fgets(buffer, sizeof(buffer), file) != NULL) {
         lineCount++;
 
         if (lineCount == n) {
-            foundLine = 1;
-            // Rewind the file pointer to overwrite the line
-            fseek(file, -strlen(buffer), SEEK_CUR);
-            fputs(newString, file);
-            // Pad the remaining characters with spaces to ensure old content is overwritten
-            int padding = strlen(buffer) - strlen(newString);
-            for (int i = 0; i < padding; i++) {
-                fputc(' ', file);
-            }
-            break;
+            // Replace the nth line with the new content
+            fputs(newContent, tempFile);
+        } else {
+            // Write the line as is
+            fputs(buffer, tempFile);
         }
     }
 
-    if (!foundLine) {
-        printf("Error: Line %d not found in the file.\n", n);
-    }
-
+    // Close the input and temporary files
     fclose(file);
+    fclose(tempFile);
+
+    // Replace the original file with the temporary file
+    if (rename(tempFilename, filename) != 0) {
+        printf("Error: Failed to replace the original file\n");
+    }
 }
 
 void removeDirectory(const char* path) {

@@ -6,7 +6,7 @@
 #include "../include/graph.h"
 #include "../include/util.h"
 
-#define TAGS_FILE "data/tags.txt"
+#define GRAPH_FILE "data/graph.txt"
 //#include "file.h"
 //#include "tag.h"
 
@@ -134,6 +134,65 @@ void clear(void) {
     return;
 }
 
+int link(int argc, char *argv[]) {
+
+    if (argc < 2) {
+        printf("Error: Too few arguments supplied\n");
+        return -1;
+    }
+    char header_path[256];
+    char *name1 = argv[1];
+    char *name2 = argv[2];
+    int file1_exists = 0;
+    int file2_exists = 0;
+    int id1 = 0;
+    int id2 = 0;
+
+    // Check for file 1
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        sprintf(header_path, "data/%d.txt", i);
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_name != NULL && strcmp(read_name, name1) == 0) {
+            printf("Found file with name %s\n", read_name);
+            if (strcmp(read_type, "tag") == 0) {
+                file1_exists = 1;
+            } else if (strcmp(read_type, "file") == 0) {
+                file1_exists = 2;
+            }
+            id1 = i;
+        }
+    }
+
+    // Check for file 2
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        sprintf(header_path, "data/%d.txt", i);
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_name != NULL && strcmp(read_name, name2) == 0) {
+            printf("Found file with name %s\n", read_name);
+            if (strcmp(read_type, "tag") == 0) {
+                file2_exists = 1;
+            } else if (strcmp(read_type, "file") == 0) {
+                file2_exists = 2;
+            }
+            id2 = i;
+        }
+    }
+
+    // Check if they are different
+    if (file1_exists == 0 || file2_exists == 0 || file1_exists == file2_exists) {
+        printf("Error: Couldn't find files with different types (Key: %d %d)\n", file1_exists, file2_exists);
+        return -1;
+    }
+
+    addEdge(graph, id1, id2);
+    saveGraph(graph, GRAPH_FILE);
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
 
     // Create the data directory if it doesn't exist
@@ -164,6 +223,8 @@ int main(int argc, char *argv[]) {
         clear();
     } else if (strcmp(command, "list") == 0) {
         list();
+    } else if (strcmp(command, "link") == 0) {
+        link(argc - 1, &argv[1]);
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
         print_usage_and_exit();
     } else {

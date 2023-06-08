@@ -50,6 +50,42 @@ char* readNthLine(const char* filename, int n) {
     return line;
 }
 
+void replaceNthLine(const char* filename, int n, const char* newString) {
+    FILE* file = fopen(filename, "r+");
+    if (file == NULL) {
+        printf("Error: Failed to open the file.\n");
+        return;
+    }
+
+    char buffer[1024];
+    int lineCount = 0;
+    int foundLine = 0;
+
+    // Read and write line by line
+    while (fgets(buffer, sizeof(buffer), file)) {
+        lineCount++;
+
+        if (lineCount == n) {
+            foundLine = 1;
+            // Rewind the file pointer to overwrite the line
+            fseek(file, -strlen(buffer), SEEK_CUR);
+            fputs(newString, file);
+            // Pad the remaining characters with spaces to ensure old content is overwritten
+            int padding = strlen(buffer) - strlen(newString);
+            for (int i = 0; i < padding; i++) {
+                fputc(' ', file);
+            }
+            break;
+        }
+    }
+
+    if (!foundLine) {
+        printf("Error: Line %d not found in the file.\n", n);
+    }
+
+    fclose(file);
+}
+
 void removeDirectory(const char* path) {
     DIR* dir = opendir(path);
     struct dirent* entry;

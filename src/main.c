@@ -280,6 +280,41 @@ int fileinfo(int argc, char *argv[]) {
     return 0;
 }
 
+int renamefile(int argc, char *argv[]) {
+    char *oldName = argv[1];
+    char *newName = malloc(strlen(argv[2]) + 2);  // Allocate memory for newName
+    char header_path[256];
+
+    if (newName == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        return -1;
+    }
+
+    strcpy(newName, argv[2]);  // Copy argv[2] to newName
+
+    // Add newline character to string
+    size_t len = strlen(newName);
+    newName = realloc(newName, len + 2);
+    strcat(newName, "\n");
+
+    // Check for file
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        sprintf(header_path, "data/%d.txt", i);
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_name != NULL && strcmp(read_name, oldName) == 0) {
+            replaceNthLine(header_path, 1, newName);
+            return 0;
+        }
+    }
+
+    free(newName);
+
+    printf("Error: Couldn't find file %s\n", oldName);
+    return -1;
+}
+
 int main(int argc, char *argv[]) {
 
     // Create the data directory if it doesn't exist
@@ -315,6 +350,8 @@ int main(int argc, char *argv[]) {
         unlink(argc - 1, &argv[1]);
     } else if (strcmp(command, "info") == 0) {
         fileinfo(argc - 1, &argv[1]);
+    } else if (strcmp(command, "rename") == 0) {
+        renamefile(argc - 1, &argv[1]);
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
         print_usage_and_exit();
     } else {

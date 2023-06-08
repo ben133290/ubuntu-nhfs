@@ -61,12 +61,24 @@ int add(int argc, char *argv[]) {
     // add Node to graph
     addNode(graph, graph->nodeCount+1, type);
 
+    if (strcmp(type, "file") == 0) {
+        if (argv[3] == NULL) {
+            printf("Error: Please supply a filepath to the file you are adding\n");
+            return -1;
+        }
+    }
+
     FILE *head_file = fopen(file_create_path, "w");
     if (head_file == NULL) {
         printf("Error: could not create header at %s\n", file_create_path);
         return -1;
     }
-    fprintf(head_file, "%s\n%s\n", name, type);
+
+    if (strcmp(type, "file") == 0) {
+        fprintf(head_file, "%s\n%s\n%s\n", name, type, argv[3]);
+    } else {
+        fprintf(head_file, "%s\n%s\n", name, type);
+    }
     fclose(head_file);
 
     saveGraph(graph, "data/graph.txt");

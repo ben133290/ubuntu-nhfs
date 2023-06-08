@@ -15,7 +15,8 @@ void callEditor(const char * path);
 void deleteFile(const char * path);
 const char * createFile(const char * path, const char * filename);
 
+/*
 int main() { //for testing purpose
 
-}
+}*/
 

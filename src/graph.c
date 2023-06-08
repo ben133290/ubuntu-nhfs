@@ -234,7 +234,6 @@ Graph* loadGraph(const char* filename) {
     int nodeCount;
     char buffer[256]; // Used for skipping parts of the file with fgets
     fscanf(file, "%d", &nodeCount);
-    printf("Nodecount read from file: %d\n", nodeCount);
 
     // Read and add nodes
     for (int i = 0; i < nodeCount; i++) {
@@ -258,7 +257,6 @@ Graph* loadGraph(const char* filename) {
         char type[50];
         sscanf(buffer, "%d %s", &id, type);
 
-        printf("Buffer: %s", buffer);
         // Read edges
         char* token = strtok(buffer, " ");  // Skip the ID and type
         token = strtok(NULL, " ");  // Start with the first edge ID
@@ -267,7 +265,6 @@ Graph* loadGraph(const char* filename) {
         while (token != NULL) {
             int edgeId;
             if (sscanf(token, "%d", &edgeId) == 1) {
-                printf("Adding edge from %d to %d\n", id, edgeId);
                 if (hasEdge(graph, id, edgeId) == 0) {
                     addEdge(graph, id, edgeId);
                 }

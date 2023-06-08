@@ -252,6 +252,34 @@ int unlink(int argc, char *argv[]) {
     return 0;
 }
 
+int fileinfo(int argc, char *argv[]) {
+    char *name1 = argv[1];
+    char header_path[256];
+
+    // Check for file 2
+    for (int i = 1; i <= graph->nodeCount; i++) {
+        sprintf(header_path, "data/%d.txt", i);
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_name != NULL && strcmp(read_name, name1) == 0) {
+            if (strcmp(read_type, "tag") == 0) {
+                printf("INFO\n");
+                printf("  Id:   %d\n", i);
+                printf("  Name: %s\n", read_name);
+            } else if (strcmp(read_type, "file") == 0) {
+                printf("INFO\n");
+                printf("  Id:   %d\n", i);
+                printf("  Name: %s\n", read_name);
+                printf("  Path: %s\n", readNthLine(header_path, 3));
+                printf("  Perm: %s\n", readNthLine(header_path, 4));
+            }
+        }
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
 
     // Create the data directory if it doesn't exist
@@ -265,7 +293,6 @@ int main(int argc, char *argv[]) {
         graph = createGraph();
         saveGraph(graph, "data/graph.txt");
     }
-    printGraph(graph);
 
     // Parse command-line arguments
     if (argc < 2) {
@@ -286,6 +313,8 @@ int main(int argc, char *argv[]) {
         link(argc - 1, &argv[1]);
     } else if (strcmp(command, "unlink") == 0) {
         unlink(argc - 1, &argv[1]);
+    } else if (strcmp(command, "info") == 0) {
+        fileinfo(argc - 1, &argv[1]);
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
         print_usage_and_exit();
     } else {

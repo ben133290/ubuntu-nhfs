@@ -35,8 +35,18 @@ void deleteFile(const char * path){
 
 }
 
-const char * createFile(const char * path, const char * filename){
+int createFile(const char * path) {
 
+    // Open the file in write mode
+    FILE *file = fopen(path, "w");
+    if (file == NULL) {
+        printf("Error: Failed to create file %s\n", path);
+        return -1;
+    }
+
+    // Close the file
+    fclose(file);
+    return 0;
 }
 
 /*int main() { //for testing purpose

@@ -9,6 +9,6 @@ void openFile(const char * path);
 void closeFile(const char * path);
 void callEditor(const char * path);
 void deleteFile(const char * path);
-const char * createFile(const char * path, const char * filename);
+int createFile(const char * path);
 
 #endif //INTERACTIONSYS_HEADER

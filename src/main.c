@@ -5,6 +5,7 @@
 #include "../include/setup.h"
 #include "../include/graph.h"
 #include "../include/util.h"
+#include "../include/interactionSys.h"
 
 #define GRAPH_FILE "data/graph.txt"
 //#include "file.h"
@@ -19,7 +20,11 @@ void print_usage_and_exit(void) {
     printf("  add    Add tag or file\n");
     printf("  remove Remove a tag or file\n");
     printf("  list   List all tags\n");
+    printf("  info   Print infomation on tag or file\n");
+    printf("  link   Create a link between a file and a tag\n");
+    printf("  unlink Remove a link between a file and a tag\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
+    printf("  create Create a txt file and add it to the file system\n");
     printf("\n");
     printf("Options:\n");
     printf("  -h, --help       Display this help message\n");
@@ -110,7 +115,6 @@ int rmv(int argc, char *argv[]) {
     }
 
     // Update graph
-
     return 0;
 }
 
@@ -292,6 +296,25 @@ int fileinfo(int argc, char *argv[]) {
     return 0;
 }
 
+int create(int argc,char *argv[]) {
+    if (argc < 3) {
+        printf("Error: Please enter a name and a file path where you want to create the file\n");
+    }
+
+    char *name = argv[1];
+    char *path = argv[2];
+
+    if (createFile(path) != 0) {
+        return -1;
+    }
+
+    char *newargs[4]; 
+    newargs[1] = name;
+    newargs[2] = "file";
+    newargs[3] = path;
+    return add(4, newargs);
+}
+
 int renamefile(int argc, char *argv[]) {
     char *oldName = argv[1];
     char *newName = malloc(strlen(argv[2]) + 2);  // Allocate memory for newName
@@ -358,6 +381,8 @@ int main(int argc, char *argv[]) {
         list();
     } else if (strcmp(command, "link") == 0) {
         link(argc - 1, &argv[1]);
+    } else if (strcmp(command, "create") == 0) {
+        create(argc - 1, &argv[1]);
     } else if (strcmp(command, "unlink") == 0) {
         unlink(argc - 1, &argv[1]);
     } else if (strcmp(command, "info") == 0) {

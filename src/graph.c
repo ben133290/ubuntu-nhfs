@@ -396,6 +396,11 @@ int* getUsedIDs() {
     return numbers;
 }
 
+int hasNeighbour(Graph* graph, int id) { //returns 0 if there is no neighbour
+    if(graph->nodes[id]->next == NULL) return 0;
+    else return 1;
+}
+
 // Example main method for testing (comment out to avoid duplicate main)
 /*
 int main() {

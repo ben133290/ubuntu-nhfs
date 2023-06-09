@@ -23,6 +23,7 @@ void print_usage_and_exit(void) {
     printf("  add name type [filepath]   Add tag or file\n");
     printf("  remove name                Remove a tag or file from file system\n");
     printf("  list                       List all tags\n");
+    printf("  lost                       List all untagged files\n");
     printf("  info name                  Print infomation on tag or file\n");
     printf("  link tagname filename      Create a link between a file and a tag\n");
     printf("  unlink tagname filename    Remove a link between a file and a tag\n");
@@ -162,6 +163,34 @@ void list(void) {
 
         if (read_type != NULL && strcmp(read_type, "tag") == 0) {
             printf("   %s\n", read_name);
+        }
+    }
+
+    return;
+}
+
+void listUntaggedFiles(void) {
+    char header_path[256];
+    int *nodes = getUsedIDs();
+    int i;
+
+
+    printf("Untagged Files:\n");
+
+    for (int j = 1; j < graph->nodeCount; j++) {
+        i = nodes[j];
+        if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
+            printf("Error: couldn't create header path\n");
+            return;  // Return an error code
+        }
+
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_type != NULL && strcmp(read_type, "file") == 0) {
+            if (!hasNeighbour(graph, i)) {
+                printf("    %s\n", read_name);
+            }
         }
     }
 
@@ -501,7 +530,9 @@ int main(int argc, char *argv[]) {
         clear();
     } else if (strcmp(command, "list") == 0) {
         list();
-    } else if (strcmp(command, "link") == 0) {
+    } else if (strcmp(command, "lost") == 0) {
+        listUntaggedFiles();
+    }else if (strcmp(command, "link") == 0) {
         link(argc - 1, &argv[1]);
     } else if (strcmp(command, "open") == 0) {
         open(argc - 1, &argv[1]);

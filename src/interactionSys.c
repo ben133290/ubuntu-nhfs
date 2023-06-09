@@ -7,24 +7,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "../include/interactionSys.h"
+
 
 /*
  * Opens file in standard program, also includes editors for i.e. txt files
  */
 void openFile(const char * path){
     const char * helper = "xdg-open ";
-    char buffer[256]; //TODO: is 500 enough for long paths?
+    char buffer[256];
     strncpy(buffer, helper, sizeof(buffer));
     strncat(buffer, path, sizeof(buffer) - strlen(buffer) - 1); //adds helper and path together in buffer
     const char * command = (const char*) buffer;
-    printf("%s\n",command);
-    if(system(NULL) != 0) { //Error handling for the rare case that no shell is available
-        system(command);
-        printf("Opened file successfully\n");
-    } else {
-        printf("Error: Shell unavailable for command: %s\n", command);
-    }
+    FILE *fp = popen(command, "r");
+    pclose(fp);
 }
 void closeFile(const char * path){ //might be dangerous, maybe just use editor/application quit
 
@@ -52,9 +49,9 @@ int createFile(const char * path) {
     return 0;
 }
 
-/*int main() { //for testing purpose
-    openFile("/home/seraina/ubuntu-nhfs/data/graph.txt");
-    openFile("/home/seraina/OS/ex/os-exercise-3/os-exercise-3.pdf"); //TODO why do other types of files not work?
-    openFile("/home/seraina/OS/ex/os-exercise-4/text.txt");
-    deleteFile("/home/seraina/ubuntu-nhfs/data/test1.txt");
-}*/
+//int main() { //for testing purpose
+//    openFile("/home/seraina/ubuntu-nhfs/data/graph.txt");
+//    openFile("/home/seraina/OS/ex/os-exercise-3/os-exercise-3.pdf");
+//    openFile("/home/seraina/OS/ex/os-exercise-4/text.txt");
+//    deleteFile("/home/seraina/ubuntu-nhfs/data/test1.txt");
+//}

@@ -47,10 +47,12 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
     int *nodes = getUsedIDs();
     if (argc < 3 ) {
         printf("Error: Too few arguments supplied\n");
+        free(nodes);
         return -1;
     }
     if (strcmp(type, "file") != 0 && strcmp(type, "tag") != 0) {
         printf("Error: Please specify type.\n");
+        free(nodes);
         return 0;
     }
 
@@ -63,6 +65,7 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
         printf("Checking node: %d\n", id);
         if (sprintf(header_path, "data/%d.txt", id) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
+            free(nodes);
             return -1;  // Return an error code
         }
 
@@ -70,6 +73,8 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
 
         if (read_name != NULL && strcmp(read_name, name) == 0) { //name should be unique?
             printf("Name already used!\n");
+            free(read_name);
+            free(nodes);
             return -1;
         }
         free(read_name);
@@ -81,6 +86,7 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
     // Create header file path
     if (sprintf(file_create_path, "data/%d.txt", newId) < 0) {
         printf("Error: Couldn't create header file\n");
+        free(nodes);
         return -1;
     }
 
@@ -90,6 +96,7 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
     if (strcmp(type, "file") == 0) {
         if (argv[3] == NULL) {
             printf("Error: Please supply a filepath to the file you are adding\n");
+            free(nodes);
             return -1;
         }
     }
@@ -98,6 +105,7 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
     FILE *head_file = fopen(file_create_path, "w");
     if (head_file == NULL) {
         printf("Error: could not create header at %s\n", file_create_path);
+        free(nodes);
         return -1;
     }
 
@@ -605,5 +613,6 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     freeGraph(graph);
+    //free(graph);
     return 0;
 }

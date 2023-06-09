@@ -14,7 +14,7 @@ There is an example main function at the bottom of this implementation.
 
 // Graph constructor
 Graph* createGraph() {
-    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    Graph* graph = (Graph*)malloc(sizeof(Graph)); //TODO: still causes a leak!
     graph->nodes = NULL;
     graph->nodeCount = 0;
     return graph;

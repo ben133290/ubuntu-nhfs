@@ -363,16 +363,18 @@ int open(int argc, char *argv[]) { //TODO: Better exception handling
         int ret = sprintf(header_path, "data/%d.txt", i);
         char *read_name = readNthLine(header_path, 1);
         char *read_type = readNthLine(header_path, 2);
-
         if (read_name != NULL && strcmp(read_name, name1) == 0) {
             if (strcmp(read_type, "file") == 0) {
-                openFile(readNthLine(header_path, 3));
-            } else if (strcmp(read_type, "tag") == 0) {
-                printf("Can't open a tag. Try opening a file.\n");
                 file_exits = 0;
+                openFile(readNthLine(header_path, 3));
+                return 0;
+            } else if (strcmp(read_type, "tag") == 0) {
+                file_exits = 0;
+                printf("Can't open a tag. Try opening a file.\n");
+                return 0;
             }
         } else if (strcmp(read_name, name1) != 0) {
-            file_exits++;
+            file_exits = 1;
         }
     }
     if (file_exits != 0) { // exception handeling

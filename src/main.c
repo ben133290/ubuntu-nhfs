@@ -44,6 +44,14 @@ int add(int argc, char *argv[]) {
     char file_create_path[256];  // Allocate memory for file_create_path
     int id = 0;
     int *nodes = getUsedIDs();
+    if (argc < 3 ) {
+        printf("Error: Too few arguments supplied\n");
+        return -1;
+    }
+    if (strcmp(type, "file") != 0 && strcmp(type, "tag") != 0) {
+        printf("Error: Please specify type.\n");
+        return 0;
+    }
 
     printf("Checking if file exists\n");
     // check if file already exists
@@ -368,7 +376,7 @@ int open(int argc, char *argv[]) { //TODO: Better exception handling
         }
     }
     if (file_exits != 0) { // exception handeling
-        printf("Specified file doesn't seem to exist. Check for typo or add file.\n");
+        printf("Error: Specified file doesn't seem to exist. Check for typo or add file.\n");
     }
     return 0;
 }
@@ -464,7 +472,6 @@ int renamefile(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-
     // Create the data directory if it doesn't exist
     struct stat st = {0};
     if (stat("data", &st) == -1) {

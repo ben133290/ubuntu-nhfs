@@ -199,6 +199,7 @@ void listUntaggedFiles(void) {
 
 void clear(void) {
     removeDirectory("data");
+    freeGraph(graph);
     return;
 }
 

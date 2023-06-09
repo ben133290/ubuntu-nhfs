@@ -14,13 +14,14 @@
  */
 void openFile(const char * path){
     const char * helper = "xdg-open ";
-    char buffer[2000]; //TODO: is 500 enough for long paths?
+    char buffer[256]; //TODO: is 500 enough for long paths?
     strncpy(buffer, helper, sizeof(buffer));
     strncat(buffer, path, sizeof(buffer) - strlen(buffer) - 1); //adds helper and path together in buffer
     const char * command = (const char*) buffer;
     printf("%s\n",command);
     if(system(NULL) != 0) { //Error handling for the rare case that no shell is available
         system(command);
+        printf("Opened file successfully\n");
     } else {
         printf("Error: Shell unavailable for command: %s\n", command);
     }

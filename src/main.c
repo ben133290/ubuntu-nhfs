@@ -26,6 +26,7 @@ void print_usage_and_exit(void) {
     printf("  info   Print infomation on tag or file\n");
     printf("  link   Create a link between a file and a tag\n");
     printf("  unlink Remove a link between a file and a tag\n");
+    printf("  open   open file in standard application\n");
     printf("  clear  Clear the tag file, deleting all tags\n");
     printf("  create Create a txt file and add it to the file system\n");
     printf("  delete Delete a file or tag entirely\n");
@@ -58,7 +59,7 @@ int add(int argc, char *argv[]) {
 
         char *read_name = readNthLine(header_path, 1);
 
-        if (read_name != NULL && strcmp(read_name, name) == 0) {
+        if (read_name != NULL && strcmp(read_name, name) == 0) { //name should be unique?
             printf("Name already used!\n");
             return -1;
         }
@@ -341,6 +342,37 @@ int fileinfo(int argc, char *argv[]) {
     return 0;
 }
 
+int open(int argc, char *argv[]) {
+    char *name1 = argv[1];
+    char header_path[256];
+    int i;
+    int *nodes = getUsedIDs();
+    int file_exits = 0;
+
+    // Check for file, don't open tags (possible but not useful), open file via interactionSys
+    for (int j = 0; j < graph->nodeCount; j++) {
+        i = nodes[j];
+        int ret = sprintf(header_path, "data/%d.txt", i);
+        char *read_name = readNthLine(header_path, 1);
+        char *read_type = readNthLine(header_path, 2);
+
+        if (read_name != NULL && strcmp(read_name, name1) == 0) {
+            if (strcmp(read_type, "file") == 0) {
+                openFile(readNthLine(header_path, 3));
+            } else if (strcmp(read_type, "tag") == 0) {
+                printf("Can't open a tag. Try opening a file.\n");
+                file_exits = 0;
+            }
+        } else if (strcmp(read_name, name1) != 0) {
+            file_exits++;
+        }
+    }
+    if (file_exits != 0) { // exception handeling
+        printf("Specified file doesn't seem to exist. Check for typo or add file.\n");
+    }
+    return 0;
+}
+
 int create(int argc,char *argv[]) {
     if (argc < 3) {
         printf("Error: Please enter a name and a file path where you want to create the file\n");
@@ -462,7 +494,9 @@ int main(int argc, char *argv[]) {
         list();
     } else if (strcmp(command, "link") == 0) {
         link(argc - 1, &argv[1]);
-    } else if (strcmp(command, "create") == 0) {
+    } else if (strcmp(command, "open") == 0) {
+        open(argc - 1, &argv[1]);
+    }else if (strcmp(command, "create") == 0) {
         create(argc - 1, &argv[1]);
     } else if (strcmp(command, "delete") == 0) {
         deletefile(argc - 1, &argv[1]);

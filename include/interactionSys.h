@@ -7,7 +7,6 @@
 
 void openFile(const char * path);
 void closeFile(const char * path);
-void callEditor(const char * path);
 void deleteFile(const char * path);
 int createFile(const char * path);
 

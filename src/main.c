@@ -20,19 +20,19 @@ void print_usage_and_exit(void) {
     printf("Usage: nhfs <command> [options]\n");
     printf("\n");
     printf("Commands:\n");
-    printf("  add    Add tag or file\n");
-    printf("  remove Remove a tag or file from file system\n");
-    printf("  list   List all tags\n");
-    printf("  info   Print infomation on tag or file\n");
-    printf("  link   Create a link between a file and a tag\n");
-    printf("  unlink Remove a link between a file and a tag\n");
-    printf("  open   open file in standard application\n");
-    printf("  clear  Clear the tag file, deleting all tags\n");
-    printf("  create Create a txt file and add it to the file system\n");
-    printf("  delete Delete a file or tag entirely\n");
+    printf("  add name type [filepath]   Add tag or file\n");
+    printf("  remove name                Remove a tag or file from file system\n");
+    printf("  list                       List all tags\n");
+    printf("  info name                  Print infomation on tag or file\n");
+    printf("  link tagname filename      Create a link between a file and a tag\n");
+    printf("  unlink tagname filename    Remove a link between a file and a tag\n");
+    printf("  open name                  Open file in standard application\n");
+    printf("  clear                      Clear the tag file, deleting all tags\n");
+    printf("  create name filepath       Create a txt file and add it to the file system\n");
+    printf("  delete name                Delete a file or tag entirely\n");
     printf("\n");
     printf("Options:\n");
-    printf("  -h, --help       Display this help message\n");
+    printf("  -h, --help                 Display this help message\n");
     printf("\n");
     exit(1);
 }
@@ -342,7 +342,7 @@ int fileinfo(int argc, char *argv[]) {
     return 0;
 }
 
-int open(int argc, char *argv[]) {
+int open(int argc, char *argv[]) { //TODO: Better exception handling
     char *name1 = argv[1];
     char header_path[256];
     int i;

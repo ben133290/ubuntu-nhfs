@@ -46,7 +46,6 @@ char* readNthLine(const char* filename, int n) {
         free(line);
         return NULL;
     }
-
     return line;
 }
 

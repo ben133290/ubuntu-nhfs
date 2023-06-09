@@ -27,8 +27,8 @@ void print_usage_and_exit(void) {
     printf("  info name                  Print infomation on tag or file\n"); //mem leak and error free
     printf("  link tagname filename      Create a link between a file and a tag\n"); //leak and error free
     printf("  unlink tagname filename    Remove a link between a file and a tag\n");
-    printf("  open name                  Open file in standard application\n");
-    printf("  clear                      Clear the tag file, deleting all tags\n");
+    printf("  open name                  Open file in standard application\n"); //leak and error free
+    printf("  clear                      Clear the tag file, deleting all tags\n"); // leak and eror free
     printf("  create name filepath       Create a txt file and add it to the file system\n"); //leak and error free
     printf("  delete name                Delete a file or tag entirely\n"); // leak and error free
     printf("\n");
@@ -126,6 +126,7 @@ int rmv(int argc, char *argv[]) {
         i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
+            free(nodes);
             return -1;  // Return an error code
         }
 
@@ -158,6 +159,7 @@ void list(void) {
         i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
+            free(nodes);
             return;  // Return an error code
         }
 
@@ -186,6 +188,7 @@ void listUntaggedFiles(void) {
         i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
+            free(nodes);
             return;  // Return an error code
         }
 
@@ -206,7 +209,6 @@ void listUntaggedFiles(void) {
 
 void clear(void) {
     removeDirectory("data");
-    freeGraph(graph);
     return;
 }
 
@@ -339,6 +341,7 @@ int unlink(int argc, char *argv[]) {
     // Check if they are different
     if (file1_exists == 0 || file2_exists == 0 || file1_exists == file2_exists) {
         printf("Error: Couldn't find files with different types (Key: %d %d)\n", file1_exists, file2_exists);
+        free(nodes);
         return -1;
     }
 
@@ -407,7 +410,7 @@ int fileinfo(int argc, char *argv[]) {
     return 0;
 }
 
-int open(int argc, char *argv[]) { //TODO: Better exception handling
+int open(int argc, char *argv[]) {
     char *name1 = argv[1];
     char header_path[256];
     int i;
@@ -423,7 +426,9 @@ int open(int argc, char *argv[]) { //TODO: Better exception handling
         if (read_name != NULL && strcmp(read_name, name1) == 0) {
             if (strcmp(read_type, "file") == 0) {
                 file_exits = 0;
-                openFile(readNthLine(header_path, 3));
+                char* path = readNthLine(header_path, 3);
+                openFile(path);
+                free(path);
                 free(nodes);
                 free(read_name);
                 free(read_type);

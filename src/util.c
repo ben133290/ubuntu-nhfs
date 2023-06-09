@@ -26,7 +26,7 @@ char* readNthLine(const char* filename, int n) {
     size_t bytesRead;
     int currentLine = 1;
 
-    while ((bytesRead = getline(&line, &bufferSize, file)) != -1) {
+    while ((bytesRead = getline(&line, &bufferSize, file)) != -1) { //TODO: there is still some memory leak here
         if (currentLine == n) {
             // Remove newline character from the end of the line, if present
             while (bytesRead > 0 && (line[bytesRead - 1] == '\n' || line[bytesRead - 1] == '\r')) {

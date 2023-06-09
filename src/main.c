@@ -20,17 +20,17 @@ void print_usage_and_exit(void) {
     printf("Usage: nhfs <command> [options]\n");
     printf("\n");
     printf("Commands:\n");
-    printf("  add name type [filepath]   Add tag or file\n");
-    printf("  remove name                Remove a tag or file from file system\n");
-    printf("  list                       List all tags\n");
-    printf("  lost                       List all untagged files\n");
-    printf("  info name                  Print infomation on tag or file\n");
-    printf("  link tagname filename      Create a link between a file and a tag\n");
+    printf("  add name type [filepath]   Add tag or file\n"); //mem leak and error free
+    printf("  remove name                Remove a tag or file from file system\n"); //mem leak and error free
+    printf("  list                       List all tags\n"); //mem leak and error free
+    printf("  lost                       List all untagged files\n"); // mem leak and error free
+    printf("  info name                  Print infomation on tag or file\n"); //mem leak and error free
+    printf("  link tagname filename      Create a link between a file and a tag\n"); //leak and error free
     printf("  unlink tagname filename    Remove a link between a file and a tag\n");
     printf("  open name                  Open file in standard application\n");
     printf("  clear                      Clear the tag file, deleting all tags\n");
-    printf("  create name filepath       Create a txt file and add it to the file system\n");
-    printf("  delete name                Delete a file or tag entirely\n");
+    printf("  create name filepath       Create a txt file and add it to the file system\n"); //leak and error free
+    printf("  delete name                Delete a file or tag entirely\n"); // leak and error free
     printf("\n");
     printf("Options:\n");
     printf("  -h, --help                 Display this help message\n");
@@ -38,7 +38,7 @@ void print_usage_and_exit(void) {
     exit(1);
 }
 
-int add(int argc, char *argv[]) {
+int add(int argc, char *argv[]) { //TODO: still leaks memory
     char *name = argv[1];
     char *type = argv[2];
     char header_path[256];  // Allocate memory for header_path
@@ -72,6 +72,7 @@ int add(int argc, char *argv[]) {
             printf("Name already used!\n");
             return -1;
         }
+        free(read_name);
     }
 
     // Find unused id
@@ -108,7 +109,7 @@ int add(int argc, char *argv[]) {
     fclose(head_file);
 
     saveGraph(graph, "data/graph.txt");
-
+    free(nodes);
     return 0;
 }
 
@@ -137,9 +138,11 @@ int rmv(int argc, char *argv[]) {
             saveGraph(graph, "data/graph.txt");
             printf("Removed header file at %s\n", header_path);
         }
+        free(read_name);
     }
 
-    // Update graph
+    // TODO??: Update graph
+    free(nodes);
     return 0;
 }
 
@@ -164,8 +167,10 @@ void list(void) {
         if (read_type != NULL && strcmp(read_type, "tag") == 0) {
             printf("   %s\n", read_name);
         }
+        free(read_name);
+        free(read_type);
     }
-
+    free(nodes);
     return;
 }
 
@@ -192,8 +197,10 @@ void listUntaggedFiles(void) {
                 printf("    %s\n", read_name);
             }
         }
+        free(read_name);
+        free(read_type);
     }
-
+    free(nodes);
     return;
 }
 
@@ -236,6 +243,8 @@ int link(int argc, char *argv[]) {
             }
             id1 = i;
         }
+        free(read_name);
+        free(read_type);
     }
 
     // Check for file 2
@@ -254,16 +263,20 @@ int link(int argc, char *argv[]) {
             }
             id2 = i;
         }
+        free(read_name);
+        free(read_type);
     }
 
     // Check if they are different
     if (file1_exists == 0 || file2_exists == 0 || file1_exists == file2_exists) {
         printf("Error: Couldn't find files with different types (Key: %d %d)\n", file1_exists, file2_exists);
+        free(nodes);
         return -1;
     }
 
     addEdge(graph, id1, id2);
     saveGraph(graph, GRAPH_FILE);
+    free(nodes);
     return 0;
 }
 
@@ -299,6 +312,8 @@ int unlink(int argc, char *argv[]) {
             }
             id1 = i;
         }
+        free(read_name);
+        free(read_type);
     }
 
     // Check for file 2
@@ -317,6 +332,8 @@ int unlink(int argc, char *argv[]) {
             }
             id2 = i;
         }
+        free(read_name);
+        free(read_type);
     }
 
     // Check if they are different
@@ -327,6 +344,7 @@ int unlink(int argc, char *argv[]) {
 
     removeEdge(graph, id1, id2);
     saveGraph(graph, GRAPH_FILE);
+    free(nodes);
     return 0;
 }
 
@@ -343,8 +361,11 @@ int print_adj(int nodeId) {
             sprintf(header_path, "data/%d.txt", i);
             char *read_name = readNthLine(header_path, 1);
             printf("    %s\n", read_name);
+            free(read_name);
         }
+
     }
+    free(nodes);
     return 0;
 }
 
@@ -371,12 +392,18 @@ int fileinfo(int argc, char *argv[]) {
                 printf("INFO\n");
                 printf("  Id:   %d\n", i);
                 printf("  Name: %s\n", read_name);
-                printf("  Path: %s\n", readNthLine(header_path, 3));
-                printf("  Perm: %s\n", readNthLine(header_path, 4));
+                char * path = readNthLine(header_path, 3);
+                char * perm = readNthLine(header_path, 4);
+                printf("  Path: %s\n", path);
+                printf("  Perm: %s\n", perm);
+                free(path);
+                free(perm);
             }
         }
+        free(read_name);
+        free(read_type);
     }
-
+    free(nodes);
     return 0;
 }
 
@@ -397,19 +424,28 @@ int open(int argc, char *argv[]) { //TODO: Better exception handling
             if (strcmp(read_type, "file") == 0) {
                 file_exits = 0;
                 openFile(readNthLine(header_path, 3));
+                free(nodes);
+                free(read_name);
+                free(read_type);
                 return 0;
             } else if (strcmp(read_type, "tag") == 0) {
                 file_exits = 0;
                 printf("Can't open a tag. Try opening a file.\n");
+                free(read_name);
+                free(read_type);
+                free(nodes);
                 return 0;
             }
         } else if (strcmp(read_name, name1) != 0) {
             file_exits = 1;
         }
+        free(read_name);
+        free(read_type);
     }
     if (file_exits != 0) { // exception handeling
         printf("Error: Specified file doesn't seem to exist. Check for typo or add file.\n");
     }
+    free(nodes);
     return 0;
 }
 
@@ -456,12 +492,19 @@ void deletefile(int argc, char *argv[]) {
                 } else {
                     printf("Unable to delete the file.\n");
                 }
+                free(read_path);
             } 
             rmv(argc, argv);
+            free(read_name);
+            free(read_type);
+            free(nodes);
             return;
         }
+        free(read_name);
+        free(read_type);
     }
 
+    free(nodes);
     return;
 }
 
@@ -495,11 +538,14 @@ int renamefile(int argc, char *argv[]) {
             replaceNthLine(header_path, 1, newName);
             return 0;
         }
+        free(read_name);
+        free(read_type);
     }
 
     free(newName);
 
     printf("Error: Couldn't find file %s\n", oldName);
+    free(nodes);
     return -1;
 }
 
@@ -553,6 +599,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error: Unknown command '%s'\n", command);
         exit(1);
     }
-
+    freeGraph(graph);
     return 0;
 }

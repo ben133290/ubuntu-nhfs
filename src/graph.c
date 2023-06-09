@@ -70,7 +70,7 @@ void addEdge(Graph* graph, int id1, int id2) {
     }
 
     // Add edge between nodes
-    Node* edge1 = createNode(id2, node2->type);
+    Node* edge1 = createNode(id2, node2->type); //TODO: were to free these suckers
     Node* edge2 = createNode(id1, node1->type);
 
     Node* temp1 = node1->next;
@@ -317,6 +317,7 @@ void freeGraph(Graph* graph) {
             free(current);
             current = next;
         }
+
     }
 
     free(graph->nodes);

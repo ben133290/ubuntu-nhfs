@@ -151,7 +151,7 @@ void list(void) {
 
     printf("Tags:\n");
 
-    for (int j = 1; j < graph->nodeCount; j++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
         i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");
@@ -177,7 +177,7 @@ void listUntaggedFiles(void) {
 
     printf("Untagged Files:\n");
 
-    for (int j = 1; j < graph->nodeCount; j++) {
+    for (int j = 0; j < graph->nodeCount; j++) {
         i = nodes[j];
         if (sprintf(header_path, "data/%d.txt", i) < 0) {  // Check if sprintf was successful
             printf("Error: couldn't create header path\n");

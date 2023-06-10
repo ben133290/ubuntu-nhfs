@@ -24,7 +24,7 @@ Graph* createGraph() {
 Node* createNode(int id, const char* type) {
     Node* node = (Node*)malloc(sizeof(Node)); //TODO: Causes leak
     node->id = id;
-    node->type = (char*)malloc(strlen(type) + 1); //TODO: CAuses leak
+    node->type = (char*)malloc(strlen(type) + 1); //TODO: Causes leak
     strcpy(node->type, type);
     node->next = NULL;
     return node;
@@ -32,7 +32,7 @@ Node* createNode(int id, const char* type) {
 
 // Add a node to the graph
 void addNode(Graph* graph, int id, const char* type) {
-    Node* newNode = createNode(id, type); //TODO: causes leak
+    Node* newNode = createNode(id, type);
 
     if (graph->nodes == NULL) {
         // Initializes the adj. list
@@ -307,9 +307,9 @@ int hasEdge(Graph* graph, int id1, int id2) {
     return 0;  // Edge not found
 }
 
-void freeNodes(Node** nodes){
+void freeNode(Node* head){
+    //printf("Bas news: i got here\n");
     Node* helper;
-    Node* head = (Node *) nodes;
     while(head != NULL) {
         helper = head;
         head = head->next;
@@ -320,14 +320,11 @@ void freeNodes(Node** nodes){
 
 // Use this to free the graph after use
 void freeGraph(Graph* graph) {
-//    for (int i = 0; i < graph->nodeCount; i++) {
-//        Node* current = graph->nodes[i];
-//        while (current != NULL) {
-//            Node* next = current->next;
-//            free(current->type);
-//            free(current);
-//            current = next;
-//        }
+    //printf("Do i get here then?\n");
+    for (int i = 0; i < graph->nodeCount; i++) {
+        Node *current = graph->nodes[i];
+        freeNode(current);
+    }
     free(graph->nodes);
     free(graph);
 }
@@ -406,8 +403,11 @@ int* getUsedIDs() {
 }
 
 int hasNeighbour(Graph* graph, int id) { //returns 0 if there is no neighbour
-    if(graph->nodes[id]->next == NULL) return 0;
-    else return 1;
+    if(graph->nodes[id] == NULL) {
+        return 0;
+    } else if(graph->nodes[id]->next == NULL) {
+        return 0;
+    } else return 1;
 }
 
 // Example main method for testing (comment out to avoid duplicate main)

@@ -127,6 +127,7 @@ int rmv(int argc, char *argv[]) {
     char header_path[256];
     int *nodes = getUsedIDs();
     int i;
+    int exists = 0;
     
     printf("Searching for node with name %s\n", name);
     // Check if file with name exists
@@ -205,6 +206,7 @@ void listUntaggedFiles(void) {
 
         if (read_type != NULL && strcmp(read_type, "file") == 0) {
             if (!hasNeighbour(graph, i)) {
+                //printf("i is %d and nodeCount is %d\n", i, graph->nodeCount);
                 printf("    %s\n", read_name);
             }
         }
@@ -586,7 +588,12 @@ int main(int argc, char *argv[]) {
     if (strcmp(command, "add") == 0) {
         add(argc - 1, &argv[1]);
     } else if (strcmp(command, "remove") == 0) {
-        rmv(argc - 1, &argv[1]);
+        printf("Here we have %d arguments.\n", argc);
+        if (argc < 3) {
+            printf("Error: Not enough arguments supplied. ");
+        } else {
+            rmv(argc - 1, &argv[1]);
+        }
     } else if (strcmp(command, "clear") == 0) {
         clear();
     } else if (strcmp(command, "list") == 0) {
@@ -608,9 +615,11 @@ int main(int argc, char *argv[]) {
     } else if (strcmp(command, "rename") == 0) {
         renamefile(argc - 1, &argv[1]);
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
+        freeGraph(graph);
         print_usage_and_exit();
     } else {
         fprintf(stderr, "Error: Unknown command '%s'\n", command);
+        freeGraph(graph);
         exit(1);
     }
     freeGraph(graph);//TODO: make sure it frees everything

@@ -569,7 +569,7 @@ int main(int argc, char *argv[]) {
         mkdir("data", 0777);
     }
 
-    graph = loadGraph("data/graph.txt");
+    graph = loadGraph("data/graph.txt"); //TODO: causes mem leak
     if (graph == NULL) {
         graph = createGraph();
         saveGraph(graph, "data/graph.txt");
@@ -577,6 +577,7 @@ int main(int argc, char *argv[]) {
 
     // Parse command-line arguments
     if (argc < 2) {
+        freeGraph(graph);
         print_usage_and_exit();
     }
 
@@ -612,7 +613,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Error: Unknown command '%s'\n", command);
         exit(1);
     }
-    freeGraph(graph);
-    //free(graph);
+    freeGraph(graph);//TODO: make sure it frees everything
     return 0;
 }

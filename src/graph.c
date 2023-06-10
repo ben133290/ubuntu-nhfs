@@ -14,7 +14,7 @@ There is an example main function at the bottom of this implementation.
 
 // Graph constructor
 Graph* createGraph() {
-    Graph* graph = (Graph*)malloc(sizeof(Graph)); //TODO: still causes a leak!
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
     graph->nodes = NULL;
     graph->nodeCount = 0;
     return graph;
@@ -22,9 +22,9 @@ Graph* createGraph() {
 
 // Node constructor, type should be "file" or "tag" NOT CHECKED!
 Node* createNode(int id, const char* type) {
-    Node* node = (Node*)malloc(sizeof(Node));
+    Node* node = (Node*)malloc(sizeof(Node)); //TODO: Causes leak
     node->id = id;
-    node->type = (char*)malloc(strlen(type) + 1);
+    node->type = (char*)malloc(strlen(type) + 1); //TODO: CAuses leak
     strcpy(node->type, type);
     node->next = NULL;
     return node;
@@ -32,7 +32,7 @@ Node* createNode(int id, const char* type) {
 
 // Add a node to the graph
 void addNode(Graph* graph, int id, const char* type) {
-    Node* newNode = createNode(id, type);
+    Node* newNode = createNode(id, type); //TODO: causes leak
 
     if (graph->nodes == NULL) {
         // Initializes the adj. list
@@ -70,7 +70,7 @@ void addEdge(Graph* graph, int id1, int id2) {
     }
 
     // Add edge between nodes
-    Node* edge1 = createNode(id2, node2->type); //TODO: were to free these suckers
+    Node* edge1 = createNode(id2, node2->type);
     Node* edge2 = createNode(id1, node1->type);
 
     Node* temp1 = node1->next;
@@ -307,19 +307,27 @@ int hasEdge(Graph* graph, int id1, int id2) {
     return 0;  // Edge not found
 }
 
+void freeNodes(Node** nodes){
+    Node* helper;
+    Node* head = (Node *) nodes;
+    while(head != NULL) {
+        helper = head;
+        head = head->next;
+        free(helper->type);
+        free(helper);
+    }
+}
+
 // Use this to free the graph after use
 void freeGraph(Graph* graph) {
-    for (int i = 0; i < graph->nodeCount; i++) {
-        Node* current = graph->nodes[i];
-        while (current != NULL) {
-            Node* next = current->next;
-            free(current->type);
-            free(current);
-            current = next;
-        }
-
-    }
-
+//    for (int i = 0; i < graph->nodeCount; i++) {
+//        Node* current = graph->nodes[i];
+//        while (current != NULL) {
+//            Node* next = current->next;
+//            free(current->type);
+//            free(current);
+//            current = next;
+//        }
     free(graph->nodes);
     free(graph);
 }

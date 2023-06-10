@@ -23,6 +23,7 @@ void saveGraph(Graph* graph, const char* filename);
 Graph* loadGraph(const char* filename);
 int hasEdge(Graph* graph, int id1, int id2);
 void freeGraph(Graph* graph);
+void freeNodes(Node** head);
 int getUnusedID();
 int* getUsedIDs();
 int hasNeighbour(Graph* graph, int id);

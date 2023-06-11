@@ -327,6 +327,7 @@ int unlink(int argc, char *argv[]) {
         free(read_name);
         free(read_type);
     }
+    printf("Made it out of first for loop\n");
 
     // Check for file 2
     for (int j = 0; j < graph->nodeCount; j++) {
@@ -347,6 +348,7 @@ int unlink(int argc, char *argv[]) {
         free(read_name);
         free(read_type);
     }
+    printf("Made it out of second for loop\n");
 
     // Check if they are different
     if (file1_exists == 0 || file2_exists == 0 || file1_exists == file2_exists) {
@@ -354,10 +356,12 @@ int unlink(int argc, char *argv[]) {
         free(nodes);
         return -1;
     }
+    printf("Almost done\n");
 
     removeEdge(graph, id1, id2);
     saveGraph(graph, GRAPH_FILE);
     free(nodes);
+    printf("Return\n");
     return 0;
 }
 
@@ -633,6 +637,7 @@ int main(int argc, char *argv[]) {
         }
     } else if (strcmp(command, "unlink") == 0) {
         unlink(argc - 1, &argv[1]);
+        printf("Unlink returned\n");
     } else if (strcmp(command, "info") == 0) {
         fileinfo(argc - 1, &argv[1]);
     } else if (strcmp(command, "rename") == 0) {
@@ -649,6 +654,7 @@ int main(int argc, char *argv[]) {
         freeGraph(graph);
         exit(1);
     }
+    printf("Before free graph\n");
     freeGraph(graph);//TODO: make sure it frees everything
     return 0;
 }

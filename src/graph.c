@@ -162,7 +162,7 @@ void removeEdge(Graph* graph, int id1, int id2) {
     while (current != NULL) {
         if (current->id == id2) {
             previous->next = current->next;
-            freeNode(current);
+            free(current);
             break;
         }
         previous = current;
@@ -175,7 +175,7 @@ void removeEdge(Graph* graph, int id1, int id2) {
     while (current != NULL) {
         if (current->id == id1) {
             previous->next = current->next;
-            freeNode(current);
+            free(current);
             break;
         }
         previous = current;
@@ -448,7 +448,7 @@ int hasNeighbour(Graph* graph, int id) { //returns 0 if there is no neighbour
         printf("Node id is %d", id);
         return 0;
     } else if(graph->nodes[id]->next == NULL) {
-        printf(" Else if Node id is %d", id);
+        //printf(" Else if Node id is %d", id);
         //printGraph(graph);
         return 0;
     } else return 1;

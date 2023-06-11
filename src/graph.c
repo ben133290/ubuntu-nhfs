@@ -387,11 +387,12 @@ int getUnusedID2(Graph* graph) {
     for (int i = 0; i < max+3; ++i) { //give some add one of three to be sure
         if(!idIsInGraph(graph, i)) {
             printf("Unused Id is %d\n", i);
+            free(numbers);
             return i;
         }
     }
     //printf("In line 388 of getUnusedID2\n");
-
+    free(numbers);
     return 0;
 }
 

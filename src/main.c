@@ -408,7 +408,7 @@ int fileinfo(int argc, char *argv[]) {
                 char * path = readNthLine(header_path, 3);
                 char * perm = readNthLine(header_path, 4);
                 printf("  Path: %s\n", path);
-                printf("  Perm: %s\n", perm);
+                //printf("  Perm: %s\n", perm);
                 free(path);
                 free(perm);
             }

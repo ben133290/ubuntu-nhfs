@@ -329,7 +329,7 @@ void freeGraph(Graph* graph) {
     free(graph);
 }
 
-int getUnusedID() {
+int getUnusedID() { // misfunctioning methode, replaced by getUnusedID2
     char *filename = GRAPH_FILE;
 
     FILE* file = fopen(filename, "r");
@@ -355,14 +355,54 @@ int getUnusedID() {
 
             // Update the lowest missing number if necessary
             if (num == lowestMissingNumber) {
+                //printf("num = %d, lowestMissingNumber = %d\n", num, lowestMissingNumber);
                 lowestMissingNumber++;
             }
         }
+
     }
 
-    fclose(file);
 
+    fclose(file);
+    //printf("%d is lowest missing number\n", lowestMissingNumber);
     return lowestMissingNumber;
+}
+
+int idIsInGraph(Graph* graph, int id) {
+    for (int i = 0; i < graph->nodeCount; ++i) {
+        int helper = graph->nodes[i]->id;
+        if(helper == id) {
+            //printf("Id is here %d and helper is %d\n", id, helper);
+            return 1; //is in graph
+        }
+    }
+    return 0; // is not in graph
+}
+
+int getUnusedID2(Graph* graph) {
+    int size = graph->nodeCount;
+    int* numbers = getUsedIDs();
+    int max = getMaxID(numbers, size);
+    printf("Max ID here is %d\n", max);
+    for (int i = 0; i < max+3; ++i) { //give some add one of three to be sure
+        if(!idIsInGraph(graph, i)) {
+            printf("Unused Id is %d\n", i);
+            return i;
+        }
+    }
+    //printf("In line 388 of getUnusedID2\n");
+
+    return 0;
+}
+
+int getMaxID(int* numbers, int size) {
+    int max = 0;
+    for (int i = 0; i < size; ++i) {
+        if(max < numbers[i]) {
+            max = numbers[i];
+        }
+    }
+    return max;
 }
 
 int* getUsedIDs() {

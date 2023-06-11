@@ -81,7 +81,7 @@ int add(int argc, char *argv[]) { //TODO: still leaks memory
     }
 
     // Find unused id
-    int newId = getUnusedID();
+    int newId = getUnusedID2(graph);
 
     // Create header file path
     if (sprintf(file_create_path, "data/%d.txt", newId) < 0) {

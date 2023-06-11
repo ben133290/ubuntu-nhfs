@@ -25,6 +25,9 @@ int hasEdge(Graph* graph, int id1, int id2);
 void freeGraph(Graph* graph);
 void freeNode(Node* head);
 int getUnusedID();
+int idIsInGraph(Graph* graph, int id);
+int getUnusedID2(Graph* graph);
+int getMaxID(int* numbers, int size);
 int* getUsedIDs();
 int hasNeighbour(Graph* graph, int id);
 

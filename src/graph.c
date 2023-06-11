@@ -162,7 +162,7 @@ void removeEdge(Graph* graph, int id1, int id2) {
     while (current != NULL) {
         if (current->id == id2) {
             previous->next = current->next;
-            free(current);
+            freeNode(current);
             break;
         }
         previous = current;
@@ -175,7 +175,7 @@ void removeEdge(Graph* graph, int id1, int id2) {
     while (current != NULL) {
         if (current->id == id1) {
             previous->next = current->next;
-            free(current);
+            freeNode(current);
             break;
         }
         previous = current;
@@ -383,7 +383,7 @@ int getUnusedID2(Graph* graph) {
     int size = graph->nodeCount;
     int* numbers = getUsedIDs();
     int max = getMaxID(numbers, size);
-    printf("Max ID here is %d\n", max);
+    //printf("Max ID here is %d\n", max);
     for (int i = 0; i < max+3; ++i) { //give some add one of three to be sure
         if(!idIsInGraph(graph, i)) {
             printf("Unused Id is %d\n", i);
@@ -445,8 +445,11 @@ int* getUsedIDs() {
 
 int hasNeighbour(Graph* graph, int id) { //returns 0 if there is no neighbour
     if(graph->nodes[id] == NULL) {
+        printf("Node id is %d", id);
         return 0;
     } else if(graph->nodes[id]->next == NULL) {
+        printf(" Else if Node id is %d", id);
+        //printGraph(graph);
         return 0;
     } else return 1;
 }

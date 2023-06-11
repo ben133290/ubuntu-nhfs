@@ -536,6 +536,8 @@ int renamefile(int argc, char *argv[]) {
 
     if (newName == NULL) {
         printf("Error: Memory allocation failed.\n");
+        free(nodes);
+        free(newName);
         return -1;
     }
 
@@ -555,6 +557,10 @@ int renamefile(int argc, char *argv[]) {
 
         if (read_name != NULL && strcmp(read_name, oldName) == 0) {
             replaceNthLine(header_path, 1, newName);
+            free(nodes);
+            free(newName);
+            free(read_name);
+            free(read_type);
             return 0;
         }
         free(read_name);
@@ -614,15 +620,27 @@ int main(int argc, char *argv[]) {
             open(argc - 1, &argv[1]);
         }
     }else if (strcmp(command, "create") == 0) {
-        create(argc - 1, &argv[1]);
+        if (argc < 3) {
+            printf("Error: Not enough arguments supplied.\n");
+        } else {
+            create(argc - 1, &argv[1]);
+        }
     } else if (strcmp(command, "delete") == 0) {
-        deletefile(argc - 1, &argv[1]);
+        if (argc < 3) {
+            printf("Error: Not enough arguments supplied.\n");
+        } else {
+            deletefile(argc - 1, &argv[1]);
+        }
     } else if (strcmp(command, "unlink") == 0) {
         unlink(argc - 1, &argv[1]);
     } else if (strcmp(command, "info") == 0) {
         fileinfo(argc - 1, &argv[1]);
     } else if (strcmp(command, "rename") == 0) {
-        renamefile(argc - 1, &argv[1]);
+        if (argc < 3) {
+            printf("Error: Not enough arguments supplied.\n");
+        } else {
+            renamefile(argc - 1, &argv[1]);
+        }
     } else if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
         freeGraph(graph);
         print_usage_and_exit();

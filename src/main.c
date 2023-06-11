@@ -437,6 +437,10 @@ int open(int argc, char *argv[]) {
             if (strcmp(read_type, "file") == 0) {
                 file_exits = 0;
                 char* path = readNthLine(header_path, 3);
+                if (path == NULL) {
+                    printf("Error: To few arguments.\n");
+                    return 1;
+                }
                 openFile(path);
                 free(path);
                 free(nodes);
@@ -588,9 +592,9 @@ int main(int argc, char *argv[]) {
     if (strcmp(command, "add") == 0) {
         add(argc - 1, &argv[1]);
     } else if (strcmp(command, "remove") == 0) {
-        printf("Here we have %d arguments.\n", argc);
+        //printf("Here we have %d arguments.\n", argc);
         if (argc < 3) {
-            printf("Error: Not enough arguments supplied. ");
+            printf("Error: Not enough arguments supplied.\n");
         } else {
             rmv(argc - 1, &argv[1]);
         }
@@ -603,7 +607,12 @@ int main(int argc, char *argv[]) {
     }else if (strcmp(command, "link") == 0) {
         link(argc - 1, &argv[1]);
     } else if (strcmp(command, "open") == 0) {
-        open(argc - 1, &argv[1]);
+        //printf("Here we have %d arguments.\n", argc);
+        if (argc < 3) {
+            printf("Error: Not enough arguments supplied.\n");
+        } else {
+            open(argc - 1, &argv[1]);
+        }
     }else if (strcmp(command, "create") == 0) {
         create(argc - 1, &argv[1]);
     } else if (strcmp(command, "delete") == 0) {

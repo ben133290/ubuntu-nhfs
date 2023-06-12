@@ -635,7 +635,6 @@ int main(int argc, char *argv[]) {
         }
     } else if (strcmp(command, "unlink") == 0) {
         unlink(argc - 1, &argv[1]);
-        printf("Unlink returned\n");
     } else if (strcmp(command, "info") == 0) {
         fileinfo(argc - 1, &argv[1]);
     } else if (strcmp(command, "rename") == 0) {

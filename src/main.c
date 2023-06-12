@@ -27,6 +27,7 @@ void print_usage_and_exit(void) {
     printf("  info name                  Print infomation on tag or file\n"); //mem leak and error free
     printf("  link tagname filename      Create a link between a file and a tag\n"); //leak and error free
     printf("  unlink tagname filename    Remove a link between a file and a tag\n");
+    printf("  rename oldname newname     Rename a file or tag\n");
     printf("  open name                  Open file in standard application\n"); //leak and error free
     printf("  clear                      Clear the tag file, deleting all tags\n"); // leak and eror free
     printf("  create name filepath       Create a txt file and add it to the file system\n"); //leak and error free
@@ -327,7 +328,6 @@ int unlink(int argc, char *argv[]) {
         free(read_name);
         free(read_type);
     }
-    printf("Made it out of first for loop\n");
 
     // Check for file 2
     for (int j = 0; j < graph->nodeCount; j++) {
@@ -348,7 +348,6 @@ int unlink(int argc, char *argv[]) {
         free(read_name);
         free(read_type);
     }
-    printf("Made it out of second for loop\n");
 
     // Check if they are different
     if (file1_exists == 0 || file2_exists == 0 || file1_exists == file2_exists) {
@@ -356,12 +355,11 @@ int unlink(int argc, char *argv[]) {
         free(nodes);
         return -1;
     }
-    printf("Almost done\n");
 
     removeEdge(graph, id1, id2);
     saveGraph(graph, GRAPH_FILE);
     free(nodes);
-    printf("Return\n");
+    printf("Success\n");
     return 0;
 }
 
@@ -654,7 +652,7 @@ int main(int argc, char *argv[]) {
         freeGraph(graph);
         exit(1);
     }
-    printf("Before free graph\n");
+    //printf("Before free graph\n");
     freeGraph(graph);//TODO: make sure it frees everything
     return 0;
 }

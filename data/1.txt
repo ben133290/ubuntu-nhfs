@@ -1,3 +1,2 @@
-bean
-file
-data/bean.txt
+food
+tag

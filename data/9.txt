@@ -1,0 +1,3 @@
+strawberry
+file
+data/strawberry.txt

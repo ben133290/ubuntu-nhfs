@@ -1,0 +1,3 @@
+bean
+file
+data/bean.txt
